@@ -1,0 +1,310 @@
+/* =====================================================================
+ * style.css — 外觀與排版
+ * 手機優先：預設為單欄；寬度 900px 以上切換成左右兩欄。
+ * ===================================================================== */
+:root {
+  --bg: #F5F3EC;
+  --card: #FFFFFF;
+  --text: #2C2C2A;
+  --text-2: #5F5E5A;
+  --line: #E2DFD5;
+  /* ======== ★ 顏色設定區（改顏色只需要改這裡） ======== */
+  /* 力箭頭 */
+  --push-arrow: #1FADA9;        /* 推力箭頭 */
+  --friction-arrow: #D85A30;    /* 摩擦力箭頭 */
+  /* 數值卡 */
+  --push-text: #1FADA9;         /* 推力數值卡文字 */
+  --push-bg: #46CCCC;           /* 推力數值卡背景（原指定 #46CCCK 非有效色碼，待確認） */
+  --friction-text: #D85A30;     /* 摩擦力數值卡文字 */
+  --friction-bg: #FFC76C;       /* 摩擦力數值卡背景 */
+  /* 結果顯示卡 */
+  --static-bg: #E2A6C2;   --static-text: #A87B61;     /* 推不動 */
+  --critical-bg: #FFC76C; --critical-text: #46CCCC;   /* 快動了（文字原指定 #46CCCK，待確認） */
+  --sliding-bg: #9ACBBB;  --sliding-text: #769D91;    /* 推動了 */
+  /* 按鈕 */
+  --ctl: #2D66E9;               /* 控制區按鈕、刻度按鈕、說明按鈕 */
+
+
+  /* ==================================================== */
+  --danger: #A32D2D; --danger-bg: #FCEBEB;
+  --radius: 10px;
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+body { min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+button:disabled { cursor: not-allowed; }
+[hidden] { display: none !important; }
+
+/* ---------- 標題列 ---------- */
+.site-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  max-width: 1760px; margin: 0 auto; padding: 12px 16px 4px;
+}
+.site-header h1 { font-size: 18px; font-weight: 700; margin: 0; line-height: 1.35; color: #FFFFFF; transform: translateY(9px);}
+.help-btn {
+  flex: none; width: 34px; height: 34px; border-radius: 50%;
+  border: 1.5px solid var(--ctl); background: var(--card); color: var(--ctl);
+  font-weight: 700; font-size: 17px;
+}
+
+/* ---------- 版面 ----------
+ * 手機：單欄，依序為 動畫 → 控制區 → 紀錄
+ * 電腦（900px 以上）：左欄動畫、右上控制區、右下紀錄，整頁剛好一個螢幕高
+ */
+.layout { max-width: 1760px; margin: 0 auto; padding: 8px 12px 16px; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+.layout > * { min-width: 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.site-header, .site-footer { max-width: 1760px; }
+
+/* ---------- 模擬畫面 ----------
+ * --vr：畫面寬 ÷ 可見高度（由 animation.js 依 cropTop 設定，預設 2）
+ * 人物、箱子、箭頭在 .canvas 裡，維持 800:500；天空與地面鋪滿整個畫面。
+ */
+.stage {
+  position: relative; overflow: hidden; border-radius: var(--radius);
+  aspect-ratio: var(--vr, 2); background: #EAF2F8;
+  --scroll: 0px;
+  --ground-h: calc(100% * var(--vr, 2) * var(--gr, 0.0625));   /* 地面高度由 config 的 groundY 決定 */
+}
+.canvas { position: absolute; left: 0; right: 0; bottom: 0; aspect-ratio: 800 / 500; }
+.layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+
+/* 電腦版：動畫填滿左欄。畫面變寬或變高時，人物與箱子等比例縮放並置中 */
+@supports (container-type: size) {
+  @media (min-width: 900px) {
+    .stage {
+      aspect-ratio: auto; flex: 1 1 0; min-height: 200px;
+      container-type: size;
+      --cw: min(100cqw, calc(100cqh * var(--vr, 2)));   /* 圖片實際顯示寬度 */
+      --ground-h: calc(var(--cw) * var(--gr, 0.0625));
+    }
+    .canvas { left: 50%; right: auto; width: var(--cw); transform: translateX(-50%); }
+  }
+}
+
+/* 背景：天空＋遠處的距離標樁（捲動時用來看出前進） */
+.backdrop {
+  position: absolute; left: 0; right: 0; top: 0; bottom: var(--ground-h);
+  background:
+    linear-gradient(90deg, transparent 0 47%, #B4B2A9 47% 49%, transparent 49%) var(--scroll) 100% / 25% 28% repeat-x,
+    linear-gradient(#EAF2F8, #EAF2F8);
+}
+/* 地面：三種材質 */
+.ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--ground-h);
+  border-top: 2px solid rgba(0, 0, 0, 0.25);
+  background-position: var(--scroll) 0;
+}
+.ground[data-texture="rough"] {
+  background-color: #A08C68;
+  background-image:
+    radial-gradient(circle at 20% 30%, #6E5D40 0 9%, transparent 10%),
+    radial-gradient(circle at 70% 65%, #5C4D34 0 12%, transparent 13%),
+    radial-gradient(circle at 45% 80%, #C9B48C 0 7%, transparent 8%),
+    radial-gradient(circle at 85% 20%, #7D6A4A 0 6%, transparent 7%);
+  background-size: 6% 100%, 9% 100%, 7% 100%, 11% 100%;
+}
+.ground[data-texture="normal"] {
+  background-color: #C8B79A;
+  background-image: repeating-linear-gradient(60deg, #B7A483 0 3px, transparent 3px 9px);
+}
+.ground[data-texture="smooth"] {
+  background-color: #D7E3EA;
+  background-image:
+    linear-gradient(90deg, transparent 0 99%, rgba(120, 150, 170, 0.35) 99%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0 18%, transparent 30%);
+  background-size: 25% 100%, 100% 100%;
+}
+
+/* 推不動時的用力抖動 */
+.strain { animation: strain 0.18s linear infinite; }
+@keyframes strain {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(0.35%); }
+}
+
+/* 力箭頭 */
+.arrow-line, .arrow-head { stroke-linecap: round; }
+.arrow-label {
+  font-size: 34px; font-weight: 700;
+  paint-order: stroke; stroke: #FFFFFF; stroke-width: 8px; stroke-linejoin: round;
+}
+.arrow-origin { fill: #2C2C2A; stroke: #FFFFFF; stroke-width: 3; }
+
+/* 數值卡 */
+.values { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.value { border-radius: var(--radius); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+.value--push { background: var(--push-bg); color: var(--push-text); }
+.value--friction { background: var(--friction-bg); color: var(--friction-text); }
+.value-label { font-size: 12px; font-weight: 500; }
+.value-num { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+
+/* 結果文字 */
+.result {
+  margin-top: 10px; padding: 10px 12px; border-radius: var(--radius);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px;
+  font-weight: 700; font-size: 15px;
+}
+.result[data-kind="static"]   { background: var(--static-bg); color: var(--static-text); }
+.result[data-kind="critical"] { background: var(--critical-bg); color: var(--critical-text); }
+.result[data-kind="sliding"]  { background: var(--sliding-bg); color: var(--sliding-text); }
+.result[data-kind="limit"]    { background: var(--danger-bg); color: var(--danger); }
+.link-btn {
+  border: none; background: none; padding: 2px 0; font-size: 13px; font-weight: 500;
+  color: inherit; text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* ---------- 控制區 ---------- */
+.ctl-label { margin: 2px 0 6px; font-size: 14px; font-weight: 700; }
+.ctl-label small { font-weight: 400; color: var(--text-2); margin-left: 2px; }
+.seg {
+  display: grid; grid-auto-columns: 1fr; grid-auto-flow: column;
+  border: 1.5px solid #C9C6BC; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px;
+}
+.seg button {
+  border: none; border-left: 1px solid var(--line); background: var(--card);
+  padding: 10px 4px; font-size: 16px; min-height: 44px;
+}
+.seg button:first-child { border-left: none; }
+.seg button[aria-pressed="true"] { background: var(--ctl); color: #FFFFFF; font-weight: 700; }
+.seg button:disabled:not([aria-pressed="true"]) { color: #B4B2A9; }
+.seg button:disabled[aria-pressed="true"] { opacity: 0.6; }
+
+.force-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.step-btn {
+  flex: none; width: 44px; height: 44px; border-radius: var(--radius);
+  border: 1.5px solid #C9C6BC; background: var(--card); font-size: 22px; line-height: 1;
+}
+.step-btn:disabled { color: #B4B2A9; }
+#forceSlider { flex: 1; min-width: 0; accent-color: var(--ctl); height: 32px; }
+#forceOut { flex: none; min-width: 56px; text-align: right; font-size: 20px; font-weight: 700; color: var(--ctl); font-variant-numeric: tabular-nums; }
+
+.start-btn {
+  width: 100%; min-height: 52px; border: none; border-radius: var(--radius);
+  background: var(--ctl); color: #FFFFFF; font-size: 18px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.start-btn:active:not(:disabled) { transform: scale(0.98); }
+.start-btn.is-running { opacity: 0.55; }
+
+/* ---------- 折線圖 ---------- */
+.chart-card { scroll-margin-top: 12px; }
+.controls .ctl-group:last-of-type .force-row { margin-bottom: 14px; }
+.chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.chart-head h2 { margin: 0; font-size: 16px; }
+.count { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.chart-tools { display: flex; align-items: center; gap: 8px; margin: 10px 0 6px; }
+.tools-label { font-size: 13px; color: var(--text-2); }
+.seg--small { margin: 0; border-width: 1px; }
+.seg--small button { font-size: 13px; padding: 4px 10px; min-height: 32px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-bottom: 6px; min-height: 28px; }
+.legend-item {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 4px;
+  border: 1px solid transparent; border-radius: 999px; background: none; font-size: 13px; color: var(--text-2);
+}
+.legend-item.is-current { border-color: var(--line); background: #FAF9F5; color: var(--text); font-weight: 700; }
+.legend-item.is-hidden { opacity: 0.4; text-decoration: line-through; }
+.legend-item:disabled { cursor: default; color: var(--text-2); }
+.chart-box { position: relative; height: 300px; }
+.chart-foot { display: flex; justify-content: flex-end; margin-top: 8px; }
+.chart-empty {
+  position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center;
+  padding: 0 24px 30px 50px; text-align: center; font-size: 14px; color: var(--text-2); pointer-events: none;
+}
+
+.reset-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: var(--radius);
+  border: 1.5px solid var(--danger); background: var(--card); color: var(--danger); font-weight: 700; font-size: 14px;
+}
+.reset-btn:disabled { opacity: 0.4; }
+
+/* ---------- 頁尾 ---------- */
+.site-footer { max-width: 1760px; margin: 0 auto; padding: 8px 16px 24px; text-align: center; font-size: 12px; color: var(--text-2); }
+
+/* ---------- 對話視窗 ---------- */
+.dialog {
+  border: none; border-radius: 16px; padding: 20px; width: min(92vw, 420px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25); color: var(--text);
+}
+.dialog::backdrop { background: rgba(30, 30, 28, 0.45); }
+.dialog h2 { margin: 0 32px 8px 0; font-size: 18px; }
+.dialog-text { margin: 0 0 16px; font-size: 16px; line-height: 1.7; }
+.dialog-close {
+  position: absolute; top: 10px; right: 10px; width: 36px; height: 36px;
+  border: none; background: none; font-size: 24px; color: var(--text-2);
+}
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.dialog-actions button { min-height: 42px; padding: 0 18px; border-radius: var(--radius); font-weight: 700; }
+.btn-primary { border: none; background: var(--ctl); color: #FFFFFF; }
+.btn-secondary { border: 1.5px solid #C9C6BC; background: var(--card); }
+.btn-danger { border: none; background: var(--danger); color: #FFFFFF; }
+.dots { display: flex; gap: 6px; justify-content: center; margin: 0 0 14px; }
+.dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.dots span.on { background: var(--ctl); }
+
+/* ---------- 電腦版排版（放在最後，才能覆蓋上面的手機設定） ---------- */
+@media (min-width: 900px) {
+  body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; min-height: 640px; }
+  .site-header, .site-footer { flex: none; width: 100%; }
+  .site-header { padding: 12px 20px 4px; }
+  .site-header h1 { font-size: 22px; }
+  .layout {
+    flex: 1 1 auto; min-height: 0; width: 100%;
+    padding: 8px 20px;  gap: 16px;
+    /* 右欄寬度：最窄 360px、最寬 420px，其餘空間都給動畫 */
+    grid-template-columns: minmax(0, 1fr) clamp(360px, 30vw, 420px);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "sim ctl" "sim rec";
+  }
+  .sim-card   { grid-area: sim; display: flex; flex-direction: column; min-height: 0; }
+  .controls   { grid-area: ctl; }
+  .chart-card { grid-area: rec; min-height: 0; }
+  .chart-card .chart-box { height: auto; min-height: 150px; }
+  /* 結果文字預留位置，出現時動畫畫面不會跳動 */
+  .result[hidden] { display: flex !important; visibility: hidden; }
+  .link-btn { display: none; }   /* 圖表就在旁邊，不需要捲動連結 */
+  .site-footer { padding: 2px 20px 10px; }
+
+  /* 控制區：質量與接觸面左右並排，讓圖表有更多高度 */
+  .controls { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; }
+  .ctl-group--wide, .start-btn { grid-column: 1 / -1; }
+  .seg button { font-size: 15px; }
+
+  /* 紀錄卡：重置按鈕移到「刻度」同一列右側 */
+  .chart-card {
+    display: grid; grid-template-columns: 1fr auto; column-gap: 8px;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-areas: "head head" "tools reset" "legend legend" "box box";
+  }
+  .chart-head  { grid-area: head; }
+  .chart-tools { grid-area: tools; }
+  .chart-foot  { grid-area: reset; align-self: center; margin: 0; }
+  .legend      { grid-area: legend; }
+  .chart-box   { grid-area: box; }
+  .reset-btn   { padding: 6px 12px; }
+
+  /* 控制區在右欄排得緊湊一點 */
+  .seg { margin-bottom: 10px; }
+  .seg button { min-height: 40px; padding: 6px 4px; }
+  .force-row { margin-bottom: 12px; }
+  .step-btn { width: 40px; height: 40px; }
+  .start-btn { min-height: 46px; }
+}
+
+
+body {
+  background: var(--bg) url('../assets/images/bg.png') center top / cover no-repeat;
+}
+
+.logo { height: 40px; width: auto; }        /* 調整 height 改變大小，寬度會等比例縮放 */
+.site-header h1 { flex: 1; }   
+
+.backdrop {
+  background: url('../assets/images/sky.png') var(--scroll) bottom / auto 100% repeat-x;
+}
