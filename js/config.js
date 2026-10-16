@@ -41,7 +41,7 @@ const CONFIG = {
     seconds: 3,              // 每次播放幾秒
     visualAccelScale: 45,    // 畫面加速度的放大倍率（只影響視覺速度）
     stridePx: 45,            // 背景每捲動多少（圖片座標 px）換下一張走路圖
-    arrowPxPerNewton: 5,     // 力箭頭：每 1 N 的長度（圖片座標 px）
+    arrowPxPerNewton: 10,     // 力箭頭：每 1 N 的長度（圖片座標 px）
     cropTop: 100,            // 圖片上方要裁掉的高度（px），讓手機畫面不會太高
   },
 
@@ -62,9 +62,9 @@ const CONFIG = {
       'assets/images/person_walk_4.png',
     ],
     boxes: [
-      { src: 'assets/images/box_1.png', center: [455, 405] },
-      { src: 'assets/images/box_2.png', center: [475, 388] },
-      { src: 'assets/images/box_3.png', center: [495, 368] },
+      { src: 'assets/images/box_1.png', center: [475, 345] },
+      { src: 'assets/images/box_2.png', center: [475, 328] },
+      { src: 'assets/images/box_3.png', center: [497, 328] },
     ],
   },
 

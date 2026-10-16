@@ -81,7 +81,7 @@ const Anim = (() => {
     const text = document.createElementNS(SVG_NS, 'text');
     // 標籤放在箭頭上方，從箱子中心往箭頭方向排列（推力在右、摩擦力在左）
     text.setAttribute('x', cx + dir * 12);
-    text.setAttribute('y', cy - 20);
+    text.setAttribute('y', cy + 70);
     text.setAttribute('text-anchor', dir > 0 ? 'start' : 'end');
     text.setAttribute('fill', color);
     text.setAttribute('class', 'arrow-label');
@@ -94,8 +94,8 @@ const Anim = (() => {
     const [cx, cy] = CONFIG.images.boxes[boxIndex].center;
     const k = CONFIG.animation.arrowPxPerNewton;
     const g = document.createElementNS(SVG_NS, 'g');
-    drawArrow(g, cx, cy, force * k, 1, 'var(--push)', `推力 ${fmtN(force)} N`);
-    drawArrow(g, cx, cy, friction * k, -1, 'var(--friction)', `摩擦力 ${friction.toFixed(1)} N`);
+    drawArrow(g, cx, cy, force * k, 1, 'var(--push-arrow)', `推力 ${fmtN(force)} N`);
+    drawArrow(g, cx, cy, friction * k, -1, 'var(--friction-arrow)', `摩擦力 ${friction.toFixed(1)} N`);
     // 箱子中心點
     const dot = document.createElementNS(SVG_NS, 'circle');
     dot.setAttribute('cx', cx); dot.setAttribute('cy', cy); dot.setAttribute('r', 6);

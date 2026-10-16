@@ -10,17 +10,17 @@
   --line: #E2DFD5;
   /* ======== ★ 顏色設定區（改顏色只需要改這裡） ======== */
   /* 力箭頭 */
-  --push-arrow: #1FADA9;        /* 推力箭頭 */
-  --friction-arrow: #D85A30;    /* 摩擦力箭頭 */
+  --push-arrow: #46CCCC;        /* 推力箭頭 */
+  --friction-arrow: #ffc76c;    /* 摩擦力箭頭 */
   /* 數值卡 */
-  --push-text: #1FADA9;         /* 推力數值卡文字 */
-  --push-bg: #46CCCC;           /* 推力數值卡背景（原指定 #46CCCK 非有效色碼，待確認） */
-  --friction-text: #D85A30;     /* 摩擦力數值卡文字 */
-  --friction-bg: #FFC76C;       /* 摩擦力數值卡背景 */
+  --push-text: #000000;         /* 推力數值卡文字 */
+  --push-bg: #FFFFFF;           /* 推力數值卡背景 */
+  --friction-text: #000000;     /* 摩擦力數值卡文字 */
+  --friction-bg: #FFFFFF;       /* 摩擦力數值卡背景 */
   /* 結果顯示卡 */
-  --static-bg: #E2A6C2;   --static-text: #A87B61;     /* 推不動 */
-  --critical-bg: #FFC76C; --critical-text: #46CCCC;   /* 快動了（文字原指定 #46CCCK，待確認） */
-  --sliding-bg: #9ACBBB;  --sliding-text: #769D91;    /* 推動了 */
+  --static-bg: #F75757;   --static-text: #FFFFFF;     /* 推不動 */
+  --critical-bg: #FF9f19; --critical-text: #FFFFFF;   /* 快動了（文字原指定 #46CCCK，待確認） */
+  --sliding-bg: #13bf6a;  --sliding-text: #FFFFFF;    /* 推動了 */
   /* 按鈕 */
   --ctl: #2D66E9;               /* 控制區按鈕、刻度按鈕、說明按鈕 */
 
@@ -139,15 +139,15 @@ button:disabled { cursor: not-allowed; }
 /* 數值卡 */
 .values { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .value { border-radius: var(--radius); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
-.value--push { background: var(--push-bg); color: var(--push-text); }
-.value--friction { background: var(--friction-bg); color: var(--friction-text); }
+.value--push { background: var(--push-bg); color: var(--push-text); border: 4px solid #46cccc;}
+.value--friction { background: var(--friction-bg); color: var(--friction-text); border: 4px solid #ffc76c;}
 .value-label { font-size: 12px; font-weight: 500; }
 .value-num { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
 
 /* 結果文字 */
 .result {
   margin-top: 10px; padding: 10px 12px; border-radius: var(--radius);
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; text-align: center; gap: 6px 12px;
   font-weight: 700; font-size: 15px;
 }
 .result[data-kind="static"]   { background: var(--static-bg); color: var(--static-text); }
