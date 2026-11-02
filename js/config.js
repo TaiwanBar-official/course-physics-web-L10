@@ -8,12 +8,12 @@ const CONFIG = {
 
   /* ---------- 網站標題與頁尾 ---------- */
   title: ' 超科學空間：摩擦力',
-  footer: '頁尾資訊（作者／學校／授權）之後補上',
+  footer: 'Copyright © 2026 臺灣各種吧股份有限公司. All Rights Reserved.',
 
   /* ---------- 控制變因：箱子質量（固定三個，單位 kg） ----------
    * 順序對應箱子圖片 box_1.png、box_2.png、box_3.png（輕 → 重）
    */
-  masses: [1, 3, 5],
+  masses: [2, 3, 5],
 
   /* ---------- 控制變因：接觸面 ----------
    * muS     ：最大靜摩擦係數（畫面上不會顯示）
@@ -22,9 +22,9 @@ const CONFIG = {
    * texture ：沒有地板圖片時使用的內建材質，可用 'rough'、'normal'、'smooth'
    */
   surfaces: [
+    { name: '平滑', muS: 0.2, ground: 'assets/images/ground_3.png', texture: 'smooth' },
+    { name: '普通', muS: 0.5, ground: 'assets/images/ground_2.png', texture: 'normal' },
     { name: '粗糙', muS: 0.7, ground: 'assets/images/ground_1.png', texture: 'rough' },
-    { name: '普通', muS: 0.4, ground: 'assets/images/ground_2.png', texture: 'normal' },
-    { name: '平滑', muS: 0.1, ground: 'assets/images/ground_3.png', texture: 'smooth' },
   ],
 
   kineticRatio: 0.8,   // 動摩擦力 = 最大靜摩擦力 × 0.8
@@ -97,14 +97,15 @@ const CONFIG = {
       { style: 'triangle', radius: 7, filled: false },
       { style: 'rect',     radius: 9, filled: false },
     ],
-    ranges: [40, 20, 10, 5],
+    ranges: [10, 20, 40],
   },
 
   /* ---------- 操作教學（說明視窗，每一項是一頁） ---------- */
   tutorial: [
     { title: '1. 設定控制變因', text: '先選擇箱子的質量和接觸面。同一組實驗中，這兩項要保持不變。' },
     { title: '2. 調整操控變因', text: '用滑桿或「−」「＋」按鈕設定推力大小，然後按「開始推」。' },
-    { title: '3. 觀察結果',     text: '推動時，藍色箭頭是推力，橘色箭頭是摩擦力，箭頭越長代表力越大。觀察箱子有沒有被推動，比較兩個力的大小。' },
-    { title: '4. 分析圖表',     text: '每次的推力與摩擦力會畫在折線圖上。換一組質量或接觸面，就會畫出另一條線。數值太小看不清楚時，可以切換刻度放大。' },
+    { title: '3. 牛頓', 	      text: '實驗中力的單位為牛頓（Ｎ）。1 牛頓的力約等於 0.1 公斤重。在 L11 會有更多關於牛頓的討論喔。' },
+    { title: '4. 觀察結果',     text: '推動時，藍色箭頭是推力，橘色箭頭是摩擦力，箭頭越長代表力越大。觀察箱子有沒有被推動，比較兩個力的大小。' },
+    { title: '5. 分析圖表',     text: '每次的推力與摩擦力會畫在折線圖上。換一組質量或接觸面，就會畫出另一條線。數值太小看不清楚時，可以切換刻度放大。' },
   ],
 };
